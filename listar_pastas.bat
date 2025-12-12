@@ -1,20 +1,30 @@
 @echo off
-set "PastaRaiz=Definir o caminho da pasta raiz"
+setlocal
+:: Define a codificação para UTF-8 para aceitar acentos
+chcp 65001 > nul
+
+
+set "PastaRaiz=C:\Users\example\Downloads\pasta_desejada"
 set "ArquivoSaida=%UserProfile%\Downloads\lista_pastas.txt"
 
 echo Gerando lista de pastas (usando metodo moderno para OneDrive)...
-echo Por favor, aguarde.
+echo Alvo: "%PastaRaiz%"
+echo Por favor, aguarde...
 
-REM Verifica se o caminho raiz existe
+:: Verifica se o caminho raiz existe
 if not exist "%PastaRaiz%" (
-    echo ERRO: O caminho "%PastaRaiz%" nao foi encontrado.
+    echo.
+    echo ERRO CRITICO:
+    echo A pasta "%PastaRaiz%" nao foi encontrada.
+    echo Verifique se o caminho esta correto.
     goto :fim
 )
 
-REM O PowerShell lida melhor com pastas "sob demanda" do OneDrive
+:: O PowerShell lida melhor com pastas "sob demanda" do OneDrive
+:: Adicionado -LiteralPath para evitar erros com caracteres especiais como []
 (
     echo %PastaRaiz%
-    powershell.exe -NoProfile -Command "Get-ChildItem -Path '%PastaRaiz%' -Recurse -Directory | Select-Object -ExpandProperty FullName"
+    powershell.exe -NoProfile -Command "Get-ChildItem -LiteralPath '%PastaRaiz%' -Recurse -Directory | Select-Object -ExpandProperty FullName"
 ) > "%ArquivoSaida%"
 
 echo.
@@ -24,5 +34,4 @@ echo %ArquivoSaida%
 
 :fim
 echo.
-echo Pressione qualquer tecla para sair...
 pause
